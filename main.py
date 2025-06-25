@@ -1,16 +1,30 @@
-# This is a sample Python script.
+import requests
+import pandas as pd
+from datetime import datetime
+from sqlalchemy import create_engine
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+url = "https://api.open-meteo.com/v1/forecast"
 
+params = {
+    "latitude": 52.52,
+    "longitude": 13.41,
+    "hourly": "temperature_2m"
+}
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+response = requests.get(url, params)
+data = response.json()
 
+timestamps = data["hourly"]["time"]
+templeratures = data["hourly"]["temperature_2m"]
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+df = pd.DataFrame({
+    "timestamp": pd.to_datetime(timestamps),
+    "temperature": templeratures,
+    "extracted_at": datetime.now().date(),
+})
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+engine = create_engine("postgresql+psycopg2://username:password@localhost:5432/dbname")
+
+df.to_sql("weather_berlin", engine, if_exists="append", index=False)
+
+print(f" {df}")
