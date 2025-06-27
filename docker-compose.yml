@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: pg_de
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: de_user
+      POSTGRES_PASSWORD: de_pass
+      POSTGRES_DB: de_weather
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U de_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - de_net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_de
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - postgres
+    networks:
+      - de_net
+
+volumes:
+  pg_data:
+
+networks:
+  de_net:

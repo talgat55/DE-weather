@@ -23,7 +23,7 @@ df = pd.DataFrame({
     "extracted_at": datetime.now().date(),
 })
 
-engine = create_engine("postgresql+psycopg2://username:password@localhost:5432/dbname")
+engine = create_engine("postgresql+psycopg2://de_user:de_pass@localhost:5432/de_weather")
 
 df.to_sql("weather_berlin", engine, if_exists="append", index=False)
 
