@@ -13,11 +13,6 @@ services:
       POSTGRES_DB: de_weather
     volumes:
       - pg_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U de_user"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     networks:
       - de_net
 
@@ -32,6 +27,31 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     depends_on:
       - postgres
+    networks:
+      - de_net
+
+  airflow:
+    image: apache/airflow:2.9.1-python3.11
+    container_name: airflow_de
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://de_user:de_pass@postgres:5432/de_weather
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    entrypoint: >
+      bash -c "
+      airflow db migrate &&
+      airflow users create --username airflow --password airflow --firstname Air --lastname Flow --role Admin --email airflow@example.com &&
+      airflow scheduler & 
+      exec airflow webserver"
+    ports:
+      - "8085:8080"
     networks:
       - de_net
 
