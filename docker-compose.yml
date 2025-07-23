@@ -52,8 +52,11 @@ services:
       - ./scripts:/opt/airflow/scripts
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
+      - ./requirements.txt:/requirements.txt
+
     entrypoint: >
       bash -c "
+      pip install -r /requirements.txt &&
       airflow db migrate &&
       airflow users create --username airflow --password airflow --firstname Air --lastname Flow --role Admin --email airflow@example.com &&
       airflow scheduler & 
