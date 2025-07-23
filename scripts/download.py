@@ -7,7 +7,8 @@ def download_weather_date():
     params = {
         "latitude": 52.52,
         "longitude": 13.41,
-        "hourly": "temperature_2m"
+        "hourly": "temperature_2m,relative_humidity_2m",
+        "timezone": "auto"
     }
 
     try:
